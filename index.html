@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Курьерская система</title>
+<meta name="description" content="Готовая система онлайн-заработка на привлечении курьеров. Бесплатно, с телефона, в переписке, с личным куратором на первый месяц.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap">
+<style>
+/* Layout: спокойная колонка 1120px; в первом экране — оффер слева и «выписка» о том, кто кому платит, справа. */
+:root {
+  --bg: #F3F6F5;
+  --surface: #FFFFFF;
+  --ink: #16232B;
+  --muted: #4E5D65;
+  --line: #D9E2DF;
+  --teal: #1C7C6B;
+  --teal-strong: #155F52;
+  --on-teal: #F7F5F0;
+  --teal-soft: #E2F0EB;
+  --amber: #C98512;
+  --amber-soft: #FBF0DC;
+  --frame: #16232B;
+  --chat-bg: #E6EEEB;
+  --bubble-in: #FFFFFF;
+  --font-display: "Rubik", "Trebuchet MS", Arial, sans-serif;
+  --font-body: "Nunito Sans", "Segoe UI", Arial, sans-serif;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E171C; --surface: #15222A; --ink: #ECF1EF; --muted: #A7B6BC; --line: #26363F;
+    --teal: #3BB39A; --teal-strong: #5CC7B0; --on-teal: #0E171C; --teal-soft: #14302A;
+    --amber: #F0B13A; --amber-soft: #2E2615; color-scheme: dark;
+    --frame: #2B3B45; --chat-bg: #0E171C; --bubble-in: #1E2D36;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E171C; --surface: #15222A; --ink: #ECF1EF; --muted: #A7B6BC; --line: #26363F;
+  --teal: #3BB39A; --teal-strong: #5CC7B0; --on-teal: #0E171C; --teal-soft: #14302A;
+  --amber: #F0B13A; --amber-soft: #2E2615; color-scheme: dark;
+  --frame: #2B3B45; --chat-bg: #0E171C; --bubble-in: #1E2D36;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--surface);
+}
+a { color: var(--teal); }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+p { margin: 0; }
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.eyebrow {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal);
+}
+
+/* Header */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 600; font-size: 18px; color: var(--ink); text-decoration: none; }
+.brand-mark {
+  width: 32px; height: 32px; border-radius: 9px; background: var(--teal); color: var(--on-teal);
+  display: grid; place-items: center; font-size: 16px; font-weight: 700;
+}
+.top nav { display: flex; gap: 22px; font-size: 15px; }
+.top nav a { color: var(--muted); text-decoration: none; }
+.top nav a:hover { color: var(--ink); }
+@media (max-width: 820px) { .top nav { display: none; } }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 22px; border-radius: 12px;
+  font-family: var(--font-body); font-weight: 700; font-size: 16px; text-decoration: none;
+  border: 1.5px solid transparent; transition: background .15s ease, transform .15s ease;
+}
+.btn-primary { background: var(--teal); color: var(--on-teal); }
+.btn-primary:hover { background: var(--teal-strong); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--teal); }
+.btn-sm { min-height: 40px; padding: 0 16px; font-size: 15px; }
+.btn:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) { .btn:active { transform: translateY(1px); } }
+
+/* Hero */
+.hero { padding-block: 56px 40px; }
+.hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center; }
+.hero-text { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.hero h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 700; }
+.hero h1 em { font-style: normal; color: var(--teal); }
+.lead { font-size: 19px; color: var(--muted); max-width: 58ch; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 15px; color: var(--muted); }
+.facts span { display: inline-flex; align-items: center; gap: 8px; }
+.facts span::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+@media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; gap: 32px; } .hero { padding-block: 36px 24px; } }
+
+/* Ledger: кто кому платит */
+.ledger {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+  box-shadow: 0 18px 40px -28px rgba(22, 35, 43, 0.45);
+}
+.ledger-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--line); }
+.ledger-head h2 { font-size: 18px; font-weight: 600; }
+.ledger-head span { font-size: 13px; color: var(--muted); }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding-block: 14px; border-bottom: 1px solid var(--line); }
+.row:last-of-type { border-bottom: none; }
+.row .who { font-weight: 700; }
+.row .what { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
+.row .sum { font-family: var(--font-display); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sum.plus { color: var(--teal); }
+.sum.zero { color: var(--amber); }
+.ledger-foot { margin-top: 8px; padding: 12px 14px; border-radius: 10px; background: var(--teal-soft); font-size: 15px; font-weight: 600; }
+
+/* Sections */
+section.block { padding-block: 56px; }
+section.block + section.block { border-top: 1px solid var(--line); }
+.block-head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; max-width: 720px; }
+.block-head h2 { font-size: clamp(26px, 3.4vw, 36px); font-weight: 700; }
+.block-head p { color: var(--muted); font-size: 18px; }
+
+/* Steps — реальная последовательность */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; counter-reset: step; }
+.steps li { counter-increment: step; display: flex; flex-direction: column; gap: 8px; min-width: 0; padding-top: 16px; border-top: 3px solid var(--teal); }
+.steps li::before { content: "Шаг " counter(step); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--teal); }
+.steps h3 { font-size: 19px; font-weight: 600; }
+.steps p { font-size: 15px; color: var(--muted); }
+@media (max-width: 960px) { .steps { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+@media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
+
+/* Money explainer */
+.money { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.money > div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.money h3 { font-size: 19px; font-weight: 600; }
+.money p { color: var(--muted); font-size: 16px; }
+.money .big { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--teal); font-variant-numeric: tabular-nums; }
+.note { margin-top: 20px; display: flex; gap: 12px; align-items: flex-start; padding: 16px 18px; border-radius: var(--radius); background: var(--amber-soft); }
+.note strong { white-space: nowrap; }
+@media (max-width: 860px) { .money { grid-template-columns: 1fr; } }
+
+/* What you get */
+.gets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.gets > div { display: flex; flex-direction: column; gap: 6px; padding: 18px 0 0; border-top: 1px solid var(--line); min-width: 0; }
+.gets h3 { font-size: 18px; font-weight: 600; }
+.gets p { font-size: 15px; color: var(--muted); }
+@media (max-width: 960px) { .gets { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .gets { grid-template-columns: 1fr; } }
+
+/* Fit */
+.fit { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fit > div { border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.fit .yes { background: var(--teal-soft); }
+.fit .no { background: var(--surface); border: 1px solid var(--line); }
+.fit h3 { font-size: 20px; font-weight: 600; }
+.fit ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 760px) { .fit { grid-template-columns: 1fr; } }
+
+/* FAQ */
+.faq { display: flex; flex-direction: column; border-top: 1px solid var(--line); max-width: 820px; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary {
+  list-style: none; cursor: pointer; padding: 18px 40px 18px 0; position: relative;
+  font-family: var(--font-display); font-weight: 600; font-size: 19px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: "+"; position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  font-size: 24px; color: var(--teal); font-weight: 500;
+}
+.faq details[open] summary::after { content: "−"; }
+.faq .answer { padding: 0 0 20px; color: var(--muted); max-width: 68ch; display: flex; flex-direction: column; gap: 10px; }
+
+/* Final CTA */
+.final { padding-block: 56px; }
+.final-card {
+  background: var(--ink); color: var(--bg); border-radius: 20px;
+  padding: clamp(28px, 5vw, 48px); display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: center;
+}
+.final-card h2 { font-size: clamp(26px, 3.4vw, 38px); font-weight: 700; }
+.final-card p { opacity: .85; margin-top: 12px; font-size: 18px; }
+.final-actions { display: flex; flex-direction: column; gap: 12px; }
+.final-card .btn-ghost { color: var(--bg); border-color: color-mix(in srgb, var(--bg) 35%, transparent); }
+.final-card .btn-ghost:hover { border-color: var(--bg); }
+.contact-line { font-size: 14px; opacity: .8; }
+.contact-line code { font-family: var(--font-body); font-weight: 700; user-select: all; }
+@media (max-width: 760px) { .final-card { grid-template-columns: 1fr; } }
+
+/* Icons */
+.ico { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ico-badge { width: 44px; height: 44px; border-radius: 12px; background: var(--teal-soft); color: var(--teal); display: grid; place-items: center; flex: none; }
+.steps li .ico-badge { order: 0; }
+.steps li::before { order: 1; }
+.steps li h3 { order: 2; }
+.steps li p { order: 3; }
+
+/* Work: телефон с перепиской */
+.work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.work-text { min-width: 0; }
+.work-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
+.work-list li { display: flex; gap: 14px; align-items: flex-start; }
+.work-list h3 { font-size: 18px; font-weight: 600; }
+.work-list p { color: var(--muted); font-size: 16px; }
+.phone-fig { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; }
+.phone { width: min(340px, 100%); background: var(--frame); border-radius: 38px; padding: 12px; box-shadow: 0 30px 60px -36px rgba(22, 35, 43, 0.6); }
+.screen { border-radius: 28px; background: var(--chat-bg); overflow: hidden; display: flex; flex-direction: column; }
+.chat-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--amber-soft); color: var(--amber); display: grid; place-items: center; font-family: var(--font-display); font-weight: 600; }
+.chat-head b { display: block; font-size: 15px; }
+.chat-head span { font-size: 12px; color: var(--muted); }
+.chat { padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+.msg { max-width: 82%; padding: 9px 12px 6px; border-radius: 16px; font-size: 14px; line-height: 1.4; }
+.msg.in { align-self: flex-start; background: var(--bubble-in); color: var(--ink); border-bottom-left-radius: 4px; }
+.msg.out { align-self: flex-end; background: var(--teal); color: var(--on-teal); border-bottom-right-radius: 4px; }
+.msg u { text-underline-offset: 2px; }
+.msg time { display: block; font-size: 11px; opacity: .7; text-align: right; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.chat-input { margin: 0 12px 12px; padding: 10px 14px; border-radius: 20px; background: var(--surface); color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+.chat-input .ico { width: 18px; height: 18px; color: var(--teal); }
+.phone-fig figcaption { font-size: 14px; color: var(--muted); text-align: center; }
+@media (max-width: 860px) { .work-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+footer { padding-block: 32px 48px; color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; flex-direction: column; gap: 10px; }
+footer p { max-width: 80ch; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6l-5 4H4a1 1 0 0 0-1 1z"/><path d="M15 9a3 3 0 0 1 0 6"/><path d="M18 6a7 7 0 0 1 0 12"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7z"/><path d="M3 7l12-4v4"/><path d="M16 13.5h.01"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6"/><path d="M10 17h6"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4V4z"/><path d="M8 9h8"/><path d="M8 12h5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-table" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 10h18"/><path d="M9 10v9"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 5h16v15H4z"/><path d="M4 10h16"/><path d="M8 3v4"/><path d="M16 3v4"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">К</span>Курьерская система</a>
+    <nav aria-label="Разделы">
+      <a href="#how">Как это работает</a>
+      <a href="#money">Откуда деньги</a>
+      <a href="#get">Что вы получаете</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <a class="btn btn-primary btn-sm js-tg" href="#contact" target="_blank" rel="noopener">Написать</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <p class="eyebrow">Онлайн-заработок по готовой системе</p>
+        <h1>Зарабатывайте из дома по системе, которая <em>уже работает</em></h1>
+        <p class="lead">Вы приводите новых курьеров в сервисы доставки, а партнёрская программа платит вам до&nbsp;28&nbsp;000&nbsp;₽ за каждого. Я даю всю систему бесплатно и веду вас лично первый месяц. Мой доход — 5% сверху от ваших выплат, поэтому мне важно, чтобы вы зарабатывали больше.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary js-tg" href="#contact" target="_blank" rel="noopener">Написать в Telegram</a>
+          <a class="btn btn-ghost" href="#money">Откуда деньги</a>
+        </div>
+        <div class="facts">
+          <span>0 ₽ за участие</span>
+          <span>Только переписка, без звонков</span>
+          <span>По всей России, с телефона</span>
+        </div>
+      </div>
+
+      <aside class="ledger" aria-label="Кто кому платит">
+        <div class="ledger-head">
+          <h2>Кто кому платит</h2>
+          <span>за одного приглашённого</span>
+        </div>
+        <div class="row">
+          <span class="who">Программа → вам</span>
+          <span class="sum plus">до 28 000 ₽</span>
+          <span class="what">Вознаграждение, когда приглашённый выполнил условия программы. Деньги выводите на свою карту.</span>
+        </div>
+        <div class="row">
+          <span class="who">Программа → куратору</span>
+          <span class="sum">+5% сверху</span>
+          <span class="what">Отдельная выплата, к вашим деньгам не относится.</span>
+        </div>
+        <div class="row">
+          <span class="who">Вы → куратору</span>
+          <span class="sum zero">0 ₽</span>
+          <span class="what">Ни за систему, ни за обучение, ни за сопровождение.</span>
+        </div>
+        <p class="ledger-foot">Пока вы не получили вознаграждение, я тоже ничего не получаю.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block" id="how">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">Как это работает</p>
+        <h2>Пять шагов до первой выплаты</h2>
+        <p>Ничего развозить не нужно. Вы работаете с людьми через объявления и переписку, всё делается с телефона.</p>
+      </div>
+      <ol class="steps">
+        <li><span class="ico-badge"><svg class="ico"><use href="#i-chat"/></svg></span><h3>Знакомство</h3><p>Пишете мне, я рассказываю условия на сегодня и отвечаю на вопросы.</p></li>
+        <li><span class="ico-badge"><svg class="ico"><use href="#i-book"/></svg></span><h3>Обучение</h3><p>Получаете гайд, обучение по Авито, готовые объявления и тексты для переписки.</p></li>
+        <li><span class="ico-badge"><svg class="ico"><use href="#i-megaphone"/></svg></span><h3>Объявления</h3><p>Размещаете объявления. Первое публикуем вместе.</p></li>
+        <li><span class="ico-badge"><svg class="ico"><use href="#i-send"/></svg></span><h3>Переписка</h3><p>Отвечаете откликнувшимся по готовым шаблонам и отправляете свою ссылку.</p></li>
+        <li><span class="ico-badge"><svg class="ico"><use href="#i-wallet"/></svg></span><h3>Выплата</h3><p>Приглашённый выполнил условия — программа платит вам вознаграждение.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block" id="work">
+    <div class="wrap work-grid">
+      <div class="work-text">
+        <div class="block-head">
+          <p class="eyebrow">Так выглядит работа</p>
+          <h2>Вся работа — в переписке</h2>
+          <p>Никаких звонков и встреч с кандидатами. Всё делается в мессенджере с телефона.</p>
+        </div>
+        <ul class="work-list">
+          <li><span class="ico-badge"><svg class="ico"><use href="#i-megaphone"/></svg></span><div><h3>Объявление приводит людей</h3><p>Кандидаты пишут сами — искать и уговаривать никого не нужно.</p></div></li>
+          <li><span class="ico-badge"><svg class="ico"><use href="#i-message"/></svg></span><div><h3>Вы отвечаете по шаблонам</h3><p>Готовые тексты на частые вопросы есть в обучении.</p></div></li>
+          <li><span class="ico-badge"><svg class="ico"><use href="#i-send"/></svg></span><div><h3>Отправляете свою ссылку</h3><p>Человек регистрируется по ней, и программа закрепляет его за вами.</p></div></li>
+        </ul>
+      </div>
+      <figure class="phone-fig">
+        <div class="phone" role="img" aria-label="Пример переписки с кандидатом в мессенджере">
+          <div class="screen">
+            <div class="chat-head">
+              <span class="avatar" aria-hidden="true">А</span>
+              <div><b>Алексей</b><span>кандидат с Авито</span></div>
+            </div>
+            <div class="chat">
+              <p class="msg in">Здравствуйте! Увидел объявление. Ещё ищете курьеров?<time>10:42</time></p>
+              <p class="msg out">Здравствуйте! Да, ищем. Удобнее пешком, на велосипеде или на авто?<time>10:43</time></p>
+              <p class="msg in">На велосипеде. А график какой?<time>10:45</time></p>
+              <p class="msg out">Смены выбираете сами. Вот <u>ссылка на регистрацию</u>, это пара минут.<time>10:46</time></p>
+              <p class="msg in">Зарегистрировался, спасибо!<time>10:58</time></p>
+            </div>
+            <div class="chat-input"><span>Сообщение</span><svg class="ico"><use href="#i-send"/></svg></div>
+          </div>
+        </div>
+        <figcaption>Пример переписки. Готовые тексты — в обучении.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block" id="money">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">Откуда деньги</p>
+        <h2>Платит партнёрская программа, а не вы</h2>
+        <p>Сервисам доставки постоянно нужны курьеры, и они платят тем, кто их приводит. Всё устроено прозрачно.</p>
+      </div>
+      <div class="money">
+        <div>
+          <span class="big">до 28 000 ₽</span>
+          <h3>За одного человека</h3>
+          <p>Сумма по условиям программы на <span class="js-date">ноябрь 2026</span>. Зависит от условий и может меняться.</p>
+        </div>
+        <div>
+          <span class="big">0 ₽</span>
+          <h3>Ваши расходы на систему</h3>
+          <p>Гайды, обучение, шаблоны и сопровождение бесплатны. Ничего покупать не нужно.</p>
+        </div>
+        <div>
+          <span class="big">5%</span>
+          <h3>Мой интерес</h3>
+          <p>Программа отдельно платит мне 5% сверху от ваших выплат. Чем больше зарабатываете вы, тем больше я.</p>
+        </div>
+      </div>
+      <p class="note"><strong>Важно:</strong><span>я никогда не попрошу перевести мне деньги. Если кто-то просит перевод от моего имени — это не я.</span></p>
+    </div>
+  </section>
+
+  <section class="block" id="get">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">Что вы получаете</p>
+        <h2>Всё, чтобы начать без опыта</h2>
+      </div>
+      <div class="gets">
+        <div><span class="ico-badge"><svg class="ico"><use href="#i-search"/></svg></span><h3>Обучение по Авито</h3><p>Как размещаться, чтобы откликалось много людей.</p></div>
+        <div><span class="ico-badge"><svg class="ico"><use href="#i-doc"/></svg></span><h3>Готовые объявления</h3><p>Тексты под разные площадки: копируете и публикуете.</p></div>
+        <div><span class="ico-badge"><svg class="ico"><use href="#i-message"/></svg></span><h3>Скрипты переписки</h3><p>Что отвечать кандидатам и как довести их до первых заказов.</p></div>
+        <div><span class="ico-badge"><svg class="ico"><use href="#i-shield"/></svg></span><h3>Ответы на сомнения</h3><p>Готовые ответы на частые вопросы кандидатов.</p></div>
+        <div><span class="ico-badge"><svg class="ico"><use href="#i-book"/></svg></span><h3>Пошаговый гайд</h3><p>Весь путь от первого объявления до выплаты.</p></div>
+        <div><span class="ico-badge"><svg class="ico"><use href="#i-table"/></svg></span><h3>Трекер</h3><p>Таблица, чтобы не терять ни одного кандидата.</p></div>
+        <div><span class="ico-badge"><svg class="ico"><use href="#i-calendar"/></svg></span><h3>План на две недели</h3><p>Что делать по дням на старте.</p></div>
+        <div><span class="ico-badge"><svg class="ico"><use href="#i-user"/></svg></span><h3>Личный куратор</h3><p>Живой человек на связи весь первый месяц, а не бот.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">Кому подходит</p>
+        <h2>Честно о том, для кого это</h2>
+      </div>
+      <div class="fit">
+        <div class="yes">
+          <h3>Подойдёт, если вы</h3>
+          <ul>
+            <li>хотите дополнительный доход из дома</li>
+            <li>предпочитаете переписку звонкам</li>
+            <li>готовы действовать по инструкции</li>
+            <li>можете выделять время в своём графике</li>
+          </ul>
+        </div>
+        <div class="no">
+          <h3>Не подойдёт, если вы</h3>
+          <ul>
+            <li>ищете гарантированный доход без усилий</li>
+            <li>не готовы размещать объявления и отвечать людям</li>
+            <li>ждёте результата в первый же день</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="faq">
+    <div class="wrap">
+      <div class="block-head">
+        <p class="eyebrow">Вопросы</p>
+        <h2>Частые вопросы</h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>Это не развод?</summary>
+          <div class="answer"><p>Вы не платите мне ни на одном этапе. Вознаграждение выплачивает партнёрская программа, её условия можно прочитать самому. Мой интерес — 5% сверху от ваших выплат, и я его не скрываю.</p></div>
+        </details>
+        <details>
+          <summary>Это сетевой маркетинг?</summary>
+          <div class="answer"><p>Нет. Вы ничего не покупаете и не собираете команду. Деньги платят только за курьеров, которые вышли на заказы.</p></div>
+        </details>
+        <details>
+          <summary>Нужно ли звонить людям?</summary>
+          <div class="answer"><p>Нет. Кандидаты сами пишут по объявлению, а вы отвечаете в переписке по готовым шаблонам.</p></div>
+        </details>
+        <details>
+          <summary>Нужен ли опыт?</summary>
+          <div class="answer"><p>Нет. Есть обучение, готовые тексты и куратор на первый месяц. Первое объявление размещаем вместе.</p></div>
+        </details>
+        <details>
+          <summary>Сколько можно заработать?</summary>
+          <div class="answer"><p>За одного приглашённого, который выполнил условия программы, — до 28 000 ₽. Итог зависит от того, сколько людей вы приведёте. Гарантировать доход я не буду.</p></div>
+        </details>
+        <details>
+          <summary>Нужно ли что-то оформлять?</summary>
+          <div class="answer">
+            <p>Да. Программа платит официально, поэтому выплаты получает ИП на налоге на профессиональный доход — это как самозанятость, только со счётом для выплат. Оформление онлайн, я проведу по шагам.</p>
+            <p>Нет дохода — нет налога. С полученных денег налог 4–6%, деклараций и фиксированных взносов на НПД нет. Правила — на сайте налоговой <a href="https://npd.nalog.ru/" target="_blank" rel="noopener">npd.nalog.ru</a>.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Где искать людей?</summary>
+          <div class="answer"><p>Главный канал — Авито, плюс чаты и соцсети. Искать можно по всей России, не только в своём городе.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final" id="contact">
+    <div class="wrap">
+      <div class="final-card">
+        <div>
+          <h2>Напишите, и я расскажу условия на сегодня</h2>
+          <p>Отвечу на вопросы и пришлю материалы. Решение остаётся за вами.</p>
+        </div>
+        <div class="final-actions">
+          <a class="btn btn-primary js-tg" href="#contact" target="_blank" rel="noopener">Написать в Telegram</a>
+          <a class="btn btn-ghost js-max" href="#contact" target="_blank" rel="noopener">Написать в MAX</a>
+          <p class="contact-line">Telegram: <code class="js-tg-text">@bizzsup</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>«Курьерская система» — независимый участник партнёрской программы. Не является работодателем и не представляет сервисы доставки.</p>
+    <p>Условия и размер вознаграждения определяет партнёрская программа, они могут меняться. Гарантий дохода нет.</p>
+  </div>
+</footer>
+
+<script>
+  // Контакты — заменить на свои.
+  const CONFIG = {
+    telegram: "bizzsup",           // ник в Telegram без @
+    max: "https://max.ru/u/f9LHodD0cOLbV9_Eirlagcz8jk5oGC_A8KuxHW4h-7NEu-V0tu8dEQiBDvo", // профиль в MAX
+    conditionsDate: "ноябрь 2026"  // дата условий программы
+  };
+  const tgUrl = "https://t.me/" + CONFIG.telegram;
+  document.querySelectorAll(".js-tg").forEach(a => { a.href = tgUrl; });
+  document.querySelectorAll(".js-max").forEach(a => { a.href = CONFIG.max; });
+  document.querySelectorAll(".js-tg-text").forEach(el => { el.textContent = "@" + CONFIG.telegram; });
+  document.querySelectorAll(".js-date").forEach(el => { el.textContent = CONFIG.conditionsDate; });
+</script>
+
+</body>
+</html>
